@@ -1,0 +1,2 @@
+compile :
+gcc -o spi spi.c -l bcm2835
