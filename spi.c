@@ -1,9 +1,9 @@
 #include <bcm2835.h>
 #include <stdio.h>
 
-#define CONVST RPI_V2_GPIO_P1_29
-#define BUSY RPI_V2_GPIO_P1_31
-#define RESET RPI_V2_GPIO_P1_33
+#define CONVST 5
+#define BUSY 6
+#define RESET 13
 int main(int argc,char **argv)
 {
 	char data_buffer[8];
@@ -37,7 +37,6 @@ int main(int argc,char **argv)
 		bcm2835_spi_transfern(&data_buffer[0],8);
 		for(i=0;i<8;i++)
 			printf("0x%02X\n",data_buffer[i]);
-		bcm2835_delayMicroseconds(300);
 		bcm2835_gpio_write(CONVST,LOW);
 		bcm2835_gpio_write(BUSY,LOW);
 	}
