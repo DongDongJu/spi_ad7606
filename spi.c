@@ -30,17 +30,18 @@ int main(int argc,char **argv)
 	while(1)
 	{
 		//-------------------start
-		bcm2835_gpio_write(CONVST,high);
-		bcm2835_gpio_write(BUSY,high);
+		bcm2835_gpio_write(CONVST,HIGH);
+		bcm2835_gpio_write(BUSY,HIGH);
 		for(i=0;i<8;i++)
 			data_buffer[i] = 0x00 + i;
 		bcm2835_spi_transfern(&data_buffer[0],8);
 		for(i=0;i<8;i++)
 			printf("0x%02X\n",data_buffer[i]);
 		bcm2835_delayMicroseconds(300);
-		bcm2835_gpio_write(CONVST,low);
-		bcm2835_gpio_write(BUSY,low);
+		bcm2835_gpio_write(CONVST,LOW);
+		bcm2835_gpio_write(BUSY,LOW);
 	}
+	bcm2835_gpio_write(RESET,HIGH);
 	bcm2835_close();
 	return 0;
 }
