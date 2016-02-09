@@ -2,6 +2,7 @@
 #include <sys/time.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
+
 #define BUSY 5			// gpio pin number for read int
 #define CHANNEL		0	// spi channel
 #define SPI_SPEED   1000000	// spi speed
@@ -11,16 +12,26 @@ unsigned char data_buffer[8][3];
 unsigned char saved_data_buffer[8][100000000];
 int saved_data_buffer_cursor[8]={0,0,0,0,0,0,0,0};
 int timer_state;
+clock_t start,end;
 
 //functions
 void SPI_ad7606();
 void Save_buffer();
-
-
+int Chk_time();
 
 //---------------------------------
+// Chk_time ( input void , output int )
+// function for chk that if execution time more over than 5 minute.
+//---------------------------------
+int Chk_time(){
+	if((double)(end_point - start_point)/CLOCKS_PER_SEC > 300)
+		return 1;
+	else
+		return 0;
+}
+//---------------------------------
 // BusyHandler ( input void , output x )
-// function for handling BusyPin
+// function for handling BusyPin.
 //---------------------------------
 void BusyHandler(void) {
 	SPI_ad7606();
@@ -29,7 +40,7 @@ void BusyHandler(void) {
 
 //---------------------------------
 // SPI_ad7606 ( input void , output x )
-// function for spi communication with ad7606
+// function for spi communication with ad7606.
 //---------------------------------
 void SPI_ad7606(void){
 	int i=0;
@@ -70,6 +81,12 @@ int main(void) {
 	wiringPiISR(BUSY, INT_EDGE_BOTH, &BusyHandler);		//	INT SETUP ( INT_EDGE_FALLING , INT_EDGE_RISING )
 
 	printf("spi state = %d",spi_state);
+	start_point = clock();
 
-	while(1){}
+	while(1){
+		end_point=clock();
+		if(Chk_time()){
+		//5minute
+		}
+	}
 }
