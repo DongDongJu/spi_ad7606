@@ -37,6 +37,7 @@ int main(int argc,char **argv)
 		bcm2835_spi_transfern(&data_buffer[0],8);
 		for(i=0;i<8;i++)
 			printf("0x%02X\n",data_buffer[i]);
+		bcm2835_delay(10);
 		bcm2835_gpio_write(CONVST,LOW);
 		bcm2835_gpio_write(BUSY,LOW);
 	}
