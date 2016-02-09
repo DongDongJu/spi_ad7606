@@ -17,6 +17,25 @@ clock_t start,end;
 void SPI_ad7606();
 void Save_buffer();
 int Chk_time();
+void Save_data2file();
+
+//---------------------------------
+// Save_data2file ( input void , output x )
+// function for saving stacked data during 5 minutes.
+//---------------------------------
+
+void Save_data2file(){
+	FILE* fp;
+	int i=0;
+	if((fp=fopen("data.txt","w")) == NULL){
+		printf("failed data.txt open!");
+		exit(0);
+	}
+	for(int i=0;i<8;i++){
+		fprintf(fp,"%d %s\n",i+1,saved_data_buffer[i]);
+	}
+	fclose(fp);
+}
 
 //---------------------------------
 // Chk_time ( input void , output int )
@@ -67,6 +86,7 @@ void Save_buffer(){
 	{
 		saved_data_buffer[i][saved_data_buffer_cursor[i]]=data_buffer[i][0];
 		saved_data_buffer[i][saved_data_buffer_cursor[i]+1]=data_buffer[i][1];
+		saved_data_buffer[i][saved_data_buffer_cursor[i]+2]='\0';
 		saved_data_buffer_cursor[i]+=2;
 	}
 }
@@ -87,8 +107,7 @@ int main(void) {
 
 	while(1){
 		end=clock();
-		if(Chk_time()){
-		//5minute
-		}
+		if(Chk_time())
+			Save_data2file();
 	}
 }
