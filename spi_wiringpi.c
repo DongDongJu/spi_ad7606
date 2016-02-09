@@ -5,16 +5,26 @@
 #define BUSY 5			// gpio pin number for read int
 #define CHANNEL		0	// spi channel
 #define SPI_SPEED   1000000	// spi speed
+
+//static variable
 unsigned char data_buffer[8][3];
+unsigned char saved_data_buffer[8][100000000];
+int saved_data_buffer_cursor[8]={0,0,0,0,0,0,0,0};
+int timer_state;
+
+//functions
 void SPI_ad7606();
+void Save_buffer();
+
+
 
 //---------------------------------
 // BusyHandler ( input void , output x )
 // function for handling BusyPin
 //---------------------------------
 void BusyHandler(void) {
-	// here spi
 	SPI_ad7606();
+	Save_buffer();
 }
 
 //---------------------------------
@@ -30,6 +40,21 @@ void SPI_ad7606(void){
 		data_buffer[i][1] = i;
 		result = wiringPiSPIDataRW(CHANNEL, data_buffer[i], 2);
 		printf("result = %d channel %d \n",result,i+1);
+	}
+}
+
+//---------------------------------
+// Save_buffer ( input void , output x )
+// fuction for save buffer
+//---------------------------------
+
+void Save_buffer(){
+	int i=0;
+	for(i=0;i<8;i++)
+	{
+		saved_data_buffer[i][saved_data_buffer_cursor[i]]=data_buffer[i][0];
+		saved_data_buffer[i][saved_data_buffer_cursor[i]+1]=data_buffer[i][1];
+		saved_data_buffer_cursor[i]+=2;
 	}
 }
 
