@@ -11,7 +11,6 @@
 unsigned char data_buffer[8][3];
 unsigned char saved_data_buffer[8][100000000];
 int saved_data_buffer_cursor[8]={0,0,0,0,0,0,0,0};
-int timer_state;
 clock_t start,end;
 
 //functions
@@ -24,8 +23,11 @@ int Chk_time();
 // function for chk that if execution time more over than 5 minute.
 //---------------------------------
 int Chk_time(){
-	if((double)(end_point - start_point)/CLOCKS_PER_SEC > 300)
+	if((double)(end - start)/CLOCKS_PER_SEC > 300)
+	{
+		start=clock();
 		return 1;
+	}
 	else
 		return 0;
 }
@@ -81,10 +83,10 @@ int main(void) {
 	wiringPiISR(BUSY, INT_EDGE_BOTH, &BusyHandler);		//	INT SETUP ( INT_EDGE_FALLING , INT_EDGE_RISING )
 
 	printf("spi state = %d",spi_state);
-	start_point = clock();
+	start = clock();
 
 	while(1){
-		end_point=clock();
+		end=clock();
 		if(Chk_time()){
 		//5minute
 		}
