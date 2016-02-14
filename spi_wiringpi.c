@@ -1,9 +1,10 @@
 #include <stdio.h>
-#include <sys/time.h>
+#include <stdlib.h>
+#include <time.h>
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 
-#define BUSY 5			// gpio pin number for read int
+#define BUSY 21			// gpio pin number for read int
 #define CHANNEL		0	// spi channel
 #define SPI_SPEED   1000000	// spi speed
 
@@ -29,9 +30,9 @@ void Save_data2file(){
 	int i=0;
 	if((fp=fopen("data.txt","w")) == NULL){
 		printf("failed data.txt open!");
-		exit(0);
+		exit(1);
 	}
-	for(int i=0;i<8;i++){
+	for(i=0;i<8;i++){
 		fprintf(fp,"%d %s\n",i+1,saved_data_buffer[i]);
 	}
 	fclose(fp);
@@ -71,7 +72,7 @@ void SPI_ad7606(void){
 		data_buffer[i][0] = 0x00;
 		data_buffer[i][1] = i;
 		result = wiringPiSPIDataRW(CHANNEL, data_buffer[i], 2);
-		printf("result = %d channel %d \n",result,i+1);
+		printf("result = %x %x channel %d \n",data_buffer[i][0],data_buffer[i][1],i+1);
 	}
 }
 
@@ -98,9 +99,9 @@ int main(void) {
 
 	pinMode(BUSY, INPUT);					//	pin setup
 
-	spi_state = wiringPiSPISetup(CHANNEL, 500000);		//	spi init ( ce0 , clock )
+	spi_state = wiringPiSPISetupMode(CHANNEL, 14000000 , 2);		//	spi init ( ce0 , clock )
 
-	wiringPiISR(BUSY, INT_EDGE_BOTH, &BusyHandler);		//	INT SETUP ( INT_EDGE_FALLING , INT_EDGE_RISING )
+	wiringPiISR(BUSY, INT_EDGE_RISING, &BusyHandler);		//	INT SETUP ( INT_EDGE_FALLING , INT_EDGE_RISING )
 
 	printf("spi state = %d",spi_state);
 	start = clock();
