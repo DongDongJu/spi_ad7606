@@ -4,33 +4,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "data_set.h"
+#include "channel.h"
 
 #define BUSY 21
 #define LED 22
+#define RESET 23
 
-#define CHANNEL 0
+#define CS 0
 
-struct data_set ds[8];
+struct channel ch[8];
 
 void spi_ad7606(void) {
-	unsigned char buf[2];
+	unsigned char frag[2];
 	
 	short sum;
 	int i;
 
 	for (i = 0; i < 8; i++) {
-		wiringPiSPIDataRW(CHANNEL, buf, 2);
-		ds[i].push(&ds[i], COMB_BUF(buf));
+		wiringPiSPIDataRW(CS, frag, 2);
+		push_data(&ch[i], frag);
 	}
 
-	// FOR DEBUG ONLY.
-	if(ds[0].is_full) {
-		for(i = 0; i < ds[0].size; i++)
-			printf("%hd\n", ds[0].data[i]);
+// FOR DEBUG ONLY.
+#if 1
+	if(ch[0].is_full) {
+		for(i = 0; i < DATA_SET_NUM; i++)
+			printf("%hd\n", ch[0].data[i]);
 
 		exit(0);
 	}
+#endif
 }
 
 void busy_handler(void) {
@@ -51,9 +54,9 @@ int main(void) {
 	int i;
 
 	for(i = 0; i < 8; i++)
-		init_data_set(&ds[i]);
+		init_channel(&ch[i]);
 
-	wiringPiSPISetupMode(CHANNEL, 14000000, 2);
+	wiringPiSPISetupMode(CS, 14000000, 2);
 
 	wiringPiSetup();
 	pinMode(BUSY, INPUT);
